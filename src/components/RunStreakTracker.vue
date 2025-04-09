@@ -61,6 +61,25 @@
     <p>
       Total steps taken: <span>{{ totalSteps }}</span>
     </p>
+
+    <div class="blocks-visualization">
+      <div class="block-row">
+        <div v-for="i in onesCount" :key="`one-${i}`" class="day-block one-block">1</div>
+      </div>
+      <div class="block-row">
+        <div v-for="i in tensCount" :key="`ten-${i}`" class="day-block ten-block">10</div>
+      </div>
+      <div class="block-row">
+        <div v-for="i in hundredsCount" :key="`hundred-${i}`" class="day-block hundred-block">
+          100
+        </div>
+      </div>
+      <div class="block-row">
+        <div v-for="i in thousandsCount" :key="`thousand-${i}`" class="day-block thousand-block">
+          1000
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -74,6 +93,12 @@ const totalDays = computed(() => {
   const diffTime = Math.abs(currentDate - startDate)
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 })
+
+// Calculate block counts
+const thousandsCount = computed(() => Math.floor(totalDays.value / 1000))
+const hundredsCount = computed(() => Math.floor((totalDays.value % 1000) / 100))
+const tensCount = computed(() => Math.floor((totalDays.value % 100) / 10))
+const onesCount = computed(() => totalDays.value % 10)
 
 const totalWeeks = computed(() => {
   return Math.floor(totalDays.value / 7)
@@ -180,6 +205,60 @@ div {
   text-align: center;
   margin-top: 20px;
   font-family: Arial, sans-serif;
+}
+
+.blocks-visualization {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin: 20px auto;
+  max-width: 800px;
+}
+
+.block-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+}
+
+.day-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  color: white;
+  font-weight: bold;
+  overflow: hidden;
+}
+
+.thousand-block {
+  width: 120px;
+  height: 120px;
+  background-color: green;
+  font-size: 24px;
+}
+
+.hundred-block {
+  width: 37.8px;
+  height: 37.8px;
+  background-color: blue;
+  font-size: 10px;
+}
+
+.ten-block {
+  width: 12px;
+  height: 12px;
+  background-color: purple;
+  font-size: 6px;
+}
+
+.one-block {
+  width: 3.9px;
+  height: 3.9px;
+  background-color: #ff8a80;
+  font-size: 0px; /* Hide text but keep it for accessibility */
 }
 
 h2 {
