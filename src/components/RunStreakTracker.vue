@@ -32,6 +32,9 @@
     </p>
     <h3>Facts (at 5k/day)</h3>
     <p>
+      Distance: <span>{{ totalDistanceKm }}</span> km (<span>{{ totalDistanceMiles }}</span> miles)
+    </p>
+    <p>
       Runs around the Earth: <span>{{ timesAroundEarth }}</span>
     </p>
     <p>
@@ -123,6 +126,14 @@ const caloriesPerRun = 310
 const milesPerKm = 0.621371
 const milesPerShoe = 400
 const stepsPerRun = 6220
+
+const totalDistanceKm = computed(() => {
+  return (totalDays.value * kmPerDay).toLocaleString()
+})
+
+const totalDistanceMiles = computed(() => {
+  return (totalDays.value * kmPerDay * milesPerKm).toLocaleString()
+})
 
 const timesAroundEarth = computed(() => {
   return ((totalDays.value * kmPerDay) / 40075).toFixed(4)
