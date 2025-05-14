@@ -90,8 +90,11 @@ const startDate = new Date("2012-02-01")
 const currentDate = new Date()
 
 const totalDays = computed(() => {
-  const diffTime = Math.abs(currentDate - startDate)
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  // Reset time portions to midnight for accurate day calculation
+  const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
+  const end = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+  const diffTime = Math.abs(end - start)
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24))
 })
 
 // Calculate block counts
@@ -105,11 +108,36 @@ const totalWeeks = computed(() => {
 })
 
 const totalMonths = computed(() => {
-  return Math.floor(totalDays.value / 30)
+  const start = new Date(startDate)
+  const end = new Date(currentDate)
+
+  // Calculate years and months difference
+  let months = (end.getFullYear() - start.getFullYear()) * 12
+  months += end.getMonth() - start.getMonth()
+
+  // Adjust for day of month
+  if (end.getDate() < start.getDate()) {
+    months--
+  }
+
+  return months
 })
 
 const totalYears = computed(() => {
-  return Math.floor(totalDays.value / 365)
+  const start = new Date(startDate)
+  const end = new Date(currentDate)
+
+  let years = end.getFullYear() - start.getFullYear()
+
+  // Adjust if we haven't reached the anniversary month/day yet
+  if (
+    end.getMonth() < start.getMonth() ||
+    (end.getMonth() === start.getMonth() && end.getDate() < start.getDate())
+  ) {
+    years--
+  }
+
+  return years
 })
 
 const nextDayMilestone = computed(() => {
@@ -133,7 +161,20 @@ const nextMonthMilestone = computed(() => {
 })
 
 const daysToNextMonthMilestone = computed(() => {
-  return nextMonthMilestone.value * 30 - totalDays.value
+  // Calculate target date for the next month milestone
+  const targetMonths = nextMonthMilestone.value
+  const yearOffset = Math.floor(targetMonths / 12)
+  const monthOffset = targetMonths % 12
+
+  const targetDate = new Date(startDate)
+  targetDate.setFullYear(startDate.getFullYear() + yearOffset)
+  targetDate.setMonth(startDate.getMonth() + monthOffset)
+
+  // Calculate days between current date and target date
+  const current = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+  const target = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate())
+  const diffTime = target - current
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 })
 
 const nextYearMilestone = computed(() => {
@@ -141,7 +182,17 @@ const nextYearMilestone = computed(() => {
 })
 
 const daysToNextYearMilestone = computed(() => {
-  return nextYearMilestone.value * 365 - totalDays.value
+  // Calculate target date for the next year milestone
+  const targetYears = nextYearMilestone.value
+
+  const targetDate = new Date(startDate)
+  targetDate.setFullYear(startDate.getFullYear() + targetYears)
+
+  // Calculate days between current date and target date
+  const current = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+  const target = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate())
+  const diffTime = target - current
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 })
 
 // Facts calculations
